@@ -1,0 +1,39 @@
+meta {
+  name: 8.checkMenuAgain
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/menu
+  body: none
+  auth: inherit
+}
+
+script:post-response {
+  test("Check menu stock",
+  function(){
+    expect(res.getStatus()).to.equal(200);
+    // expect detail
+    const body = res.getBody();
+    const id_1 = bru.getVar("Menu_id");
+    const stock_1 = 0;
+    const id_2 = bru.getVar("Menu_id_overtest") ;
+    const stock_2 = bru.getVar("Menu_stock_overtest");
+    //find item and compare
+    for ( const item of body ){
+      if ( item.id == id_1 ){
+        expect( item.stock == stock_1 ).to.be.true;
+      }else{
+        if ( item.id == id_2 ){
+          expect(item.stock == stock_2 ).to.be.true;
+        }
+      }
+    }
+  })
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,57 @@
+meta {
+  name: 4.Orders
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/orders
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt_token}}
+}
+
+body:json {
+  {
+    "itemId": {{Menu_id}},
+    "quantity": {{Menu_stock}}
+  }
+}
+
+script:pre-request {
+  const menu_price = bru.interpolate('{{Menu_price}}');
+  const quantity = bru.interpolate('{{Menu_stock}}')
+  bru.setVar("total_price",( menu_price * quantity ) );
+}
+
+script:post-response {
+  test("User Order( use Token )",
+  function(){
+    expect(res.getStatus()).be.oneOf([200, 201]);
+    const data = res.getBody();
+    bru.setVar("orderId", data.orderId );
+  })
+  
+  test("Order Total Price",
+  function(){
+    const price = bru.getVar("total_price");
+    const resTotalPrice = res.getBody().totalPrice;
+    bru.setVar("total_Price_res", resTotalPrice);
+    expect( price == resTotalPrice ).to.be.true;
+  })
+  
+  test("Check standard status code",
+  function(){
+    expect(res.getStatus()).to.equal(201);
+  })
+  
+  bru.setNextRequest('5.OrderDetail');
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

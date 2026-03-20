@@ -1,0 +1,42 @@
+meta {
+  name: 6.OrdersOutofStock
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/orders
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt_token}}
+}
+
+body:json {
+  {
+    "itemId": {{Menu_id}},
+    "quantity": {{Menu_stock}}
+  }
+}
+
+script:pre-request {
+  const menu_price = bru.interpolate('{{Menu_price}}');
+  const quantity = bru.interpolate('{{Menu_stock}}')
+  bru.setVar("total_price",( menu_price * quantity ) );
+}
+
+script:post-response {
+  test("User Order( use Token )",
+  function(){
+    expect(res.getStatus()).to.be.oneOf([400, 404]);
+  })
+  
+  bru.setNextRequest('7.OrdersOverStock')
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

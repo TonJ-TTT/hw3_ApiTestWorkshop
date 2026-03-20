@@ -1,0 +1,42 @@
+meta {
+  name: 7.OrdersOverStock
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/orders
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{jwt_token}}
+}
+
+body:json {
+  {
+    "itemId": {{Menu_id_overtest}},
+    "quantity": {{menu_stock_over_plus_1}}
+  }
+}
+
+script:pre-request {
+  const menu_stock_over = bru.interpolate('{{Menu_stock_overtest}}');
+  
+  bru.setVar("menu_stock_over_plus_1",  ( Number( menu_stock_over)  + 1 ) );
+}
+
+script:post-response {
+  test("User Order( use Token )",
+  function(){
+    expect(res.getStatus()).to.be.oneOf([400, 404]);
+  })
+  
+  bru.setNextRequest('8.checkMenuAgain');
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -154,3 +154,25 @@ Your task is to create a comprehensive Bruno collection that validates the entir
 
 ---
 *Good luck. Auntie Som is counting on you!* 🍜🔥
+---
+
+## Summary what i do.
+
+1. Try order with Unauthorized and no token in header => expected 401
+2. Test Authentication Login
+3. Test Get Menu
+4. Test Order by order it to run out of stock and check total price => expect 201
+5. Test check Order detail order id , totalPrice show that same with order
+6. Test order out of stock item => expect 400
+7. Test order quantity over stock itme => expect 400
+8. Check Menu stock in each item
+
+## What i found.
+[ Logic Error ]
+1. POST /orders => totalPrice field is wrong.
+2. POST /orders => can order with quantity more than in stock
+3. GET /menu => from flow stock of item didn't match with the test expect
+    - This error may be come from it can order with quantity more than in stock ( From 2. )
+
+[ Warning ]
+I found the status code 200 it shoud use for GET PUT but this use status code 200 on POST ( POST shoud use status code 201 ).

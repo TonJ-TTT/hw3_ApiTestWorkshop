@@ -1,0 +1,39 @@
+meta {
+  name: 2.Authen
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "username": "{{userName}}",
+    "password": "{{userPassword}}"
+  }
+}
+
+script:post-response {
+  test("User Authentication",
+  function(){
+    expect(res.getStatus()).be.oneOf([200, 201]);
+    const data = res.getBody();
+    bru.setVar("jwt_token", data.accessToken);
+  })
+  
+  test("Check standard status code",
+  function(){
+    expect(res.getStatus()).be.equal(201);
+  })
+  
+  bru.setNextRequest("3.Menu");
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

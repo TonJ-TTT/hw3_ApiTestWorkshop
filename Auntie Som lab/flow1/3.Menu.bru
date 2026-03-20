@@ -1,0 +1,33 @@
+meta {
+  name: 3.Menu
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/menu
+  body: none
+  auth: inherit
+}
+
+script:post-response {
+  test("Get Menu",
+  function(){
+    expect(res.getStatus()).to.equal(200);
+    if ( res.getStatus() === 200 ){
+      bru.setVar("Menu_id", res.getBody()[0].id);
+      bru.setVar("Menu_price", res.getBody()[0].price);
+      bru.setVar("Menu_stock", res.getBody()[0].stock);
+      bru.setVar("Menu_id_overtest", res.getBody()[1].id);
+      bru.setVar("Menu_price_overtest", res.getBody()[1].price);
+      bru.setVar("Menu_stock_overtest", res.getBody()[1].stock);
+    }
+  })
+  
+  bru.setNextRequest("4.Orders");
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

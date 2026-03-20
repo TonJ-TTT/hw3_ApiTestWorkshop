@@ -1,0 +1,44 @@
+meta {
+  name: 5.OrderDetail
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/orders/{{orderId}}
+  body: none
+  auth: inherit
+}
+
+script:post-response {
+  test("User OrderDetail",
+  function(){
+    expect(res.getStatus()).to.equal(200);
+    const data = res.getBody();
+  })
+  
+  test("Order detail orderId",
+  function(){
+    const price = bru.getVar("total_price");
+    console.log( price );
+    const checkOrderID = res.getBody().orderId;
+    const order_ID = bru.getVar("orderId");
+    expect( checkOrderID == order_ID ).to.be.true;
+  })
+  
+  test("Order detail Total Price",
+  function(){
+    const checkTotalPrice = res.getBody().totalPrice;
+    const resTotalPrice = bru.getVar("total_Price_res");
+    console.log('checkTotalPrice' , checkTotalPrice );
+    console.log('resTotalPrice', resTotalPrice );
+    expect( checkTotalPrice == resTotalPrice ).to.be.true;
+  })
+  
+  bru.setNextRequest('6.OrdersOutofStock');
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

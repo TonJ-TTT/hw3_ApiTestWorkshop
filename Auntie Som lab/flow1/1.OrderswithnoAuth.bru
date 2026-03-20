@@ -1,0 +1,35 @@
+meta {
+  name: 1.OrderswithnoAuth
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/orders
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: 
+}
+
+body:json {
+  {
+    "itemId": 1,
+    "quantity": 0
+  }
+}
+
+script:post-response {
+  test("User Order( blank Token )",
+  function(){
+    expect(res.getStatus()).to.be.oneOf([401, 403, 404]);
+  })
+  bru.setNextRequest('2.Authen')
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
